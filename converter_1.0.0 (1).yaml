@@ -1,0 +1,63 @@
+---
+swagger: "2.0"
+info:
+  x-ibm-name: "converter"
+  title: "converter"
+  version: "1.0.0"
+schemes:
+- "https"
+host: "$(catalog.host)"
+basePath: "/converter"
+consumes:
+- "application/xml"
+- "application/json"
+- "application/x-www-form-urlencoded"
+- "multipart/form-data"
+produces:
+- "application/xml"
+- "application/json"
+securityDefinitions:
+  clientIdHeader:
+    type: "apiKey"
+    in: "header"
+    name: "X-IBM-Client-Id"
+security:
+- clientIdHeader: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+    - gatewayscript:
+        title: "gatewayscript"
+        version: "1.0.0"
+        source: "apim.output('application/json')\r\nvar resp = apim.getvariable('request.body');\r\
+          \nvar it = resp.item(0).toBuffer().toString();\r\nvar itsa = it.split(\"\
+          =\");\r\n         \r\nvar go = '{\"' + itsa[0] + '\":\"' + itsa[1] + '\"\
+          }';\r\napim.setvariable('message.body', go);"
+    catch: []
+  phase: "realized"
+paths:
+  /convert:
+    post:
+      responses:
+        200:
+          description: "200 OK"
+      parameters:
+      - name: "name"
+        type: "string"
+        required: true
+        in: "formData"
+definitions:
+  input:
+    properties:
+      name:
+        type: "string"
+      desc:
+        type: "string"
+      version:
+        type: "string"
+    additionalProperties: false
+tags: []
